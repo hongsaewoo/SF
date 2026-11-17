@@ -1,0 +1,32 @@
+import {DatabaseSync} from 'node:sqlite';
+import {readFileSync} from 'node:fs';
+import assert from 'node:assert/strict';
+import {onRequest} from './functions/api/[[path]].js';
+const sqlite=new DatabaseSync(':memory:');
+sqlite.exec(readFileSync('migrations/0001_community.sql','utf8'));
+const DB={prepare(sql){let values=[];return {bind(...args){values=args;return this;},async first(){return sqlite.prepare(sql).get(...values)||null;},async all(){return {results:sqlite.prepare(sql).all(...values)};},async run(){return sqlite.prepare(sql).run(...values);}};}};
+let ip=0;
+async function call(path,body,options={}) {
+ const headers={'Origin':'https://test.example','Content-Type':'application/json','CF-Connecting-IP':String(++ip),...options.headers};
+ return onRequest({request:new Request('https://test.example/api'+path,{method:body===undefined?'GET':'POST',headers,...(body===undefined?{}:{body:JSON.stringify(body)})}),env:options.env||{DB}});
+}
+assert.equal((await call('/posts',undefined,{env:{}})).status,503);
+const post={title:'<script>alert(1)</script>',body:"a ' SQL % _ ",author:'테스터',category:'THOUGHT'};
+assert.equal((await call('/posts',post,{headers:{Origin:'https://other.example'}})).status,403);
+assert.equal((await call('/posts',{...post,title:' '})).status,400);
+const create=await call('/posts',post);assert.equal(create.status,201);const {id}=await create.json();
+let list=await (await call('/posts')).json();assert.equal(list.total,1);assert.equal(list.posts[0].title,post.title);
+assert.equal((await (await call('/posts?q=%25')).json()).total,1);
+assert.equal((await (await call('/posts?q=nomatch')).json()).total,0);
+assert.equal((await call('/posts/'+id+'/comments',{author:'댓글',body:'공유 댓글'})).status,201);
+assert.equal((await (await call('/posts/'+id+'/comments')).json()).comments.length,1);
+assert.equal((await (await call('/posts')).json()).posts[0].comment_count,1);
+assert.equal((await call('/posts/00000000-0000-0000-0000-000000000000/comments',{author:'x',body:'y'})).status,404);
+const sameIp={headers:{'CF-Connecting-IP':'shared'}};
+assert.equal((await call('/posts',post,sameIp)).status,201);
+assert.equal((await call('/posts/'+id+'/comments',{author:'x',body:'y'},sameIp)).status,429);
+for(let i=0;i<22;i++)assert.equal((await call('/posts',{...post,title:'기록 '+i})).status,201);
+list=await (await call('/posts')).json();assert.equal(list.posts.length,20);assert.equal(list.hasMore,true);
+assert.equal((await (await call('/posts?offset=20')).json()).posts.length,4);
+sqlite.close();
+console.log('PASS: schema, shared posts/comments, search, pagination, validation, origin, atomic rate limit');
