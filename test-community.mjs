@@ -28,5 +28,9 @@ assert.equal((await call('/posts/'+id+'/comments',{author:'x',body:'y'},sameIp))
 for(let i=0;i<22;i++)assert.equal((await call('/posts',{...post,title:'기록 '+i})).status,201);
 list=await (await call('/posts')).json();assert.equal(list.posts.length,20);assert.equal(list.hasMore,true);
 assert.equal((await (await call('/posts?offset=20')).json()).posts.length,4);
+const proxyEnv={DB,ALLOWED_ORIGINS:'https://null-vector-example.vercel.app'};
+assert.equal((await call('/posts',post,{env:proxyEnv,headers:{Origin:'https://null-vector-example.vercel.app'}})).status,201);
+assert.equal((await call('/posts',post,{env:proxyEnv,headers:{Origin:'https://unrelated.vercel.app'}})).status,403);
+assert.equal((await call('/posts',post,{env:proxyEnv,headers:{Origin:'https://null-vector-example.vercel.app.evil.example'}})).status,403);
 sqlite.close();
 console.log('PASS: schema, shared posts/comments, search, pagination, validation, origin, atomic rate limit');

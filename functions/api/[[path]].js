@@ -25,7 +25,11 @@ export async function onRequest({request, env}) {
     }
     if (request.method !== 'POST') return json({error:'지원하지 않는 요청입니다.'},404);
     if (path !== '/api/posts' && !match) return json({error:'주소를 찾을 수 없습니다.'},404);
-    if (request.headers.get('Origin') !== url.origin) return json({error:'허용되지 않은 요청입니다.'},403);
+    const allowedOrigins = new Set([url.origin]);
+    for (const value of (env.ALLOWED_ORIGINS || '').split(',')) {
+      try { const origin = new URL(value.trim()); if (origin.protocol === 'https:' && origin.origin === value.trim()) allowedOrigins.add(origin.origin); } catch {}
+    }
+    if (!allowedOrigins.has(request.headers.get('Origin'))) return json({error:'허용되지 않은 요청입니다.'},403);
     if (!(request.headers.get('Content-Type') || '').startsWith('application/json')) return json({error:'JSON 요청이 필요합니다.'},415);
     const raw = await request.text();
     if (new TextEncoder().encode(raw).length > 20000) return json({error:'내용이 너무 깁니다.'},413);

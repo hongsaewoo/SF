@@ -8,4 +8,5 @@ if (databaseId) {
   if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(databaseId)) throw new Error('D1_DATABASE_ID must be a D1 database UUID');
   config.d1_databases = [{binding:'DB',database_name:'null-vector-community',database_id:databaseId}];
 }
+if (process.env.ALLOWED_ORIGINS?.trim()) config.vars = {...config.vars,ALLOWED_ORIGINS:process.env.ALLOWED_ORIGINS.trim()};
 await writeFile('wrangler.deploy.json',JSON.stringify(config,null,2));
