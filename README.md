@@ -1,5 +1,19 @@
 # NULL / VECTOR — Cloudflare 커뮤니티
 
+## 현재 sf.workers.dev 프로젝트 설정 (Workers)
+
+기존 프로젝트가 Workers라면 아래 설정을 사용합니다. 아래의 Pages 안내는 별도 Pages 프로젝트에만 해당합니다.
+
+1. D1에서 `null-vector-community`를 만들고 Console에서 `migrations/0001_community.sql`을 실행합니다.
+2. D1 화면의 Database ID(UUID)를 복사합니다. API 토큰이나 계정 ID가 아닙니다.
+3. Workers 프로젝트 `sf` → Settings → Build의 빌드 변수에 `D1_DATABASE_ID`를 추가하고 복사한 UUID를 값으로 설정합니다. 런타임 변수가 아닌 빌드 환경 변수입니다.
+4. 빌드 명령: `node build.mjs`
+5. 배포 명령: `npx wrangler deploy --config wrangler.deploy.json`
+6. 루트 디렉터리는 기본값(저장소 루트), 브랜치는 `main`으로 두고 재배포합니다. Workers에는 Pages의 출력 디렉터리 설정이 필요하지 않습니다.
+7. `https://sf.hongsaewoo.workers.dev/api/posts`에서 JSON 응답을 확인합니다.
+
+이 설정은 Worker 서버 코드와 정적 파일을 함께 배포하고 D1을 `DB`로 연결합니다. D1 ID 없이 먼저 배포해도 서버 코드는 생기지만 API는 DB 연결 안내(503)를 반환합니다. 이후 D1_DATABASE_ID를 설정하고 재배포하세요. 대시보드에서만 수동으로 추가한 DB 바인딩은 다음 코드 배포에서 덮어써질 수 있으므로 위 빌드 변수 방식을 유지하세요.
+
 Pages + Pages Functions + D1을 사용합니다. 외부 DB 서비스는 필요 없습니다.
 
 ## 친구 Cloudflare 계정에서 설정
