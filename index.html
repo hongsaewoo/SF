@@ -7,55 +7,199 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700&display=swap');
 :root{color-scheme:dark;--bg:#080b0c;--panel:#0d1214;--line:#263136;--ink:#dce6e4;--muted:#80908e;--green:#bcff76}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px 'IBM Plex Mono','Noto Sans KR',monospace}button,input,textarea,select{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--green);outline-offset:4px}button:disabled{cursor:wait;opacity:.35}a{color:inherit}button{color:var(--ink);background:transparent;border:1px solid var(--line);padding:12px 18px}button:hover:not(:disabled){border-color:var(--green);color:var(--green)}.mono{letter-spacing:.15em}.muted{color:var(--muted)}.green{color:var(--green)}.tag{font-size:10px;letter-spacing:.14em}.dot{display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;margin-right:8px}.brand{font-weight:600;letter-spacing:.16em}.brand span{color:var(--green)}
-#gate{min-height:100svh;display:flex;flex-direction:column;padding:30px 40px;background:radial-gradient(ellipse at center,#15201944,transparent 65%)}.gate-top,.gate-bottom{display:flex;justify-content:space-between;gap:20px}.gate-top{align-items:center}.gate-middle{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:44px 0}.eyebrow{font-size:10px;letter-spacing:.25em;color:var(--muted)}h1{font-size:clamp(42px,8vw,110px);font-weight:500;letter-spacing:-.065em;margin:14px 0}h1 span{color:var(--green)}.scope{width:min(310px,65vw);aspect-ratio:1;position:relative;margin:25px auto 24px;border:1px solid var(--line);border-radius:50%;background:repeating-radial-gradient(circle,transparent 0,transparent calc(25% - 1px),#26313680 25%,transparent calc(25% + 1px))}.scope:before,.scope:after{content:'';position:absolute;background:var(--line)}.scope:before{height:1px;width:120%;top:50%;left:-10%}.scope:after{width:1px;height:120%;left:50%;top:-10%}#target{position:absolute;width:32px;height:32px;left:50%;top:50%;border:1px solid var(--green);transform:translate(-50%,-50%);z-index:2;box-shadow:0 0 20px #bcff7614}#target:before,#target:after{content:'';position:absolute;background:var(--green)}#target:before{height:1px;width:10px;left:10px;top:15px}#target:after{width:1px;height:10px;left:15px;top:10px}#target.locked{box-shadow:0 0 30px #bcff7633;background:#bcff7612}.scope-label{position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);background:var(--bg);padding:0 8px}#enter{width:220px;margin-top:20px;background:var(--green);border-color:var(--green);color:#111b0a;font-weight:600;letter-spacing:.25em}#enter:hover:not(:disabled){background:#d5ffac;color:#111b0a}.gate-bottom{font-size:10px;color:var(--muted);line-height:1.8}.progress{width:220px;height:2px;background:var(--line);margin-top:16px}.progress i{display:block;height:100%;width:0;background:var(--green)}
+#gate{min-height:100svh;display:flex;flex-direction:column;padding:30px 40px;background:radial-gradient(ellipse at center,#15201944,transparent 65%)}.gate-top,.gate-bottom{display:flex;justify-content:space-between;gap:20px}.gate-top{align-items:center}.gate-middle{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:44px 0}.eyebrow{font-size:10px;letter-spacing:.25em;color:var(--muted)}h1{font-size:clamp(42px,8vw,110px);font-weight:500;letter-spacing:-.065em;margin:14px 0}h1 span{color:var(--green)}.scope{cursor:pointer;will-change:transform;width:min(310px,65vw);aspect-ratio:1;position:relative;margin:25px auto 24px;border:1px solid var(--line);border-radius:50%;background:repeating-radial-gradient(circle,transparent 0,transparent calc(25% - 1px),#26313680 25%,transparent calc(25% + 1px))}.scope:before,.scope:after{content:'';position:absolute;background:var(--line)}.scope:before{height:1px;width:120%;top:50%;left:-10%}.scope:after{width:1px;height:120%;left:50%;top:-10%}#target{position:absolute;padding:0;width:44px;height:44px;left:50%;top:50%;border:1px solid var(--green);transform:translate(-50%,-50%);z-index:2;box-shadow:0 0 20px #bcff7614}#target:before,#target:after{content:'';position:absolute;background:var(--green)}#target:before{height:1px;width:10px;left:16px;top:21px}#target:after{width:1px;height:10px;left:21px;top:16px}#target.locked{box-shadow:0 0 30px #bcff7633;background:#bcff7612}.scope-label{position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);background:var(--bg);padding:0 8px}.gate-bottom{font-size:10px;color:var(--muted);line-height:1.8}.progress{width:220px;height:2px;background:var(--line);margin-top:16px}.progress i{display:block;height:100%;width:0;background:var(--green)}
 [hidden]{display:none!important}header{height:76px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 36px;gap:20px}nav{display:flex;gap:6px}nav button{border:0;font-size:11px;color:var(--muted);padding:10px 14px}nav button[aria-current=page]{color:var(--green);background:#bcff760b}main{max-width:1440px;margin:auto;padding:42px 36px}.page-title{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:30px}h2{font-size:clamp(27px,4vw,42px);font-weight:500;letter-spacing:-.05em;margin:10px 0}p{line-height:1.8}.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}.panel{border:1px solid var(--line);background:var(--panel);padding:24px}.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;font-size:10px;letter-spacing:.14em}.radar{position:relative;width:min(340px,75%);aspect-ratio:1;margin:20px auto;border:1px solid #435239;border-radius:50%;overflow:hidden;background:repeating-radial-gradient(circle,transparent 0,transparent 24%,#bcff7620 25%,transparent 26%),linear-gradient(90deg,transparent 49.7%,#bcff7625 50%,transparent 50.3%),linear-gradient(transparent 49.7%,#bcff7625 50%,transparent 50.3%)}.sweep{position:absolute;inset:0;background:conic-gradient(from 0deg,transparent 270deg,#bcff762a 359deg,transparent 360deg);animation:sweep 9s linear infinite}.blip{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}@keyframes sweep{to{transform:rotate(360deg)}}.coordinates{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:18px;color:var(--muted);font-size:10px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}.stat{padding:22px;border:1px solid var(--line)}.stat strong{display:block;font-size:32px;font-weight:400;margin-top:14px}.wave{width:100%;height:100px;color:var(--green)}.log-line{border-top:1px solid var(--line);padding:14px 0;display:flex;gap:18px;font-size:11px;line-height:1.7}.log-line time{color:var(--muted)}.section-label{margin:34px 0 16px;font-size:11px;letter-spacing:.15em}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.record{border:1px solid var(--line);padding:24px;background:var(--panel)}.record h3{font-size:17px;font-weight:500;margin:22px 0 12px}.record p{color:var(--muted);font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}.record footer{border-top:1px solid var(--line);padding-top:16px;margin-top:24px;font-size:10px;color:var(--muted);display:flex;justify-content:space-between}.toolbar{display:flex;gap:10px;margin-bottom:24px}.toolbar input{flex:1;min-width:0}.primary{background:var(--green);color:#111b0a;border-color:var(--green)}form{max-width:720px}label{display:block;margin:24px 0 10px;color:var(--muted);font-size:12px}input,textarea,select{width:100%;padding:14px;background:#080c0d;color:var(--ink);border:1px solid var(--line);border-radius:0}textarea{min-height:180px;resize:vertical}.form-actions{display:flex;align-items:center;gap:20px;margin-top:24px}.site-footer{padding:24px 36px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--muted);font-size:10px;gap:20px}#notice{color:var(--green);min-height:24px}.empty{color:var(--muted);padding:36px;border:1px solid var(--line)}@media(max-width:760px){#gate{padding:24px}.gate-top .tag{display:none}.gate-bottom{font-size:9px}header{height:auto;padding:20px;flex-wrap:wrap}nav{width:100%;justify-content:space-between}nav button{padding:10px}.header-status{display:none}main{padding:30px 20px}.layout,.cards{grid-template-columns:1fr}.page-title{align-items:start;flex-direction:column}.panel{padding:20px}.site-footer{padding:20px;flex-direction:column}.toolbar{flex-wrap:wrap}}@media(prefers-reduced-motion:reduce){.sweep{animation:none}}
+
+/* Full field of view, with a crisp, spatially aligned lens. */
+#gate{position:relative;isolation:isolate;overflow:hidden;height:100svh;min-height:420px;padding:0;background:#414449;color:#e1e3df}
+.gate-coast{position:absolute;inset:0;z-index:-2;pointer-events:none;background:url('/assets/coast-gray.jpg') center / cover no-repeat;filter:grayscale(1) brightness(.66) blur(5px);transform:scale(1.025)}
+#gate:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 30%,#070a0d80 100%)}
+.gate-top{position:absolute;inset:30px 36px auto;align-items:start;z-index:3;text-shadow:0 1px 12px #0006}
+.gate-top h1{font-size:17px;letter-spacing:.13em;line-height:1.5;margin:0;font-weight:500}
+.gate-top h1 span{color:inherit;opacity:.45}
+.gate-edition{font-size:9px;letter-spacing:.18em;line-height:1.8;color:#c5c9ca;text-align:right}
+.gate-middle{position:absolute;inset:0;display:grid;place-items:center;padding:0}
+.scope{display:block;padding:0;margin:0;width:min(51svh,46vw,496px);aspect-ratio:1;position:relative;border-radius:50%;border:1px solid #dee3d870;cursor:crosshair;will-change:transform;box-shadow:0 0 0 9px #101519bd,0 0 0 10px #aeb6b038,0 20px 70px #0005;background:#54585b;backdrop-filter:none;-webkit-backdrop-filter:none;isolation:isolate}
+.scope:hover:not(:disabled){border-color:#e3e7de;color:inherit}
+.scope:focus-visible{outline:2px solid #d2ddc8;outline-offset:16px}
+.scope-view{position:absolute;inset:0;border-radius:inherit;pointer-events:none;background-image:url('/assets/coast-gray.jpg');background-repeat:no-repeat;filter:grayscale(1) brightness(.95) contrast(1.08);z-index:-1}
+.scope:before,.scope:after{content:'';position:absolute;background:#15201cc4;z-index:1;pointer-events:none}
+.scope:before{height:1px;width:100%;top:50%;left:0}.scope:after{width:1px;height:100%;left:50%;top:0}
+.scope-shade{position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 35px #02070888;background:linear-gradient(125deg,#ffffff0c,transparent 45%,#0000000a);z-index:1}
+.scope-ticks{position:absolute;inset:14px;border-radius:50%;pointer-events:none;background:repeating-conic-gradient(#18211fc4 0deg .35deg,transparent .35deg 10deg);mask:radial-gradient(circle,transparent 67%,#000 68%);-webkit-mask:radial-gradient(circle,transparent 67%,#000 68%);z-index:1}
+.scope-label{top:32px;font-size:8px;letter-spacing:.2em;color:#18211fcc;background:transparent;padding:0;z-index:2;white-space:nowrap}
+.scope-range{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:.2em;color:#18211fcc;z-index:2;pointer-events:none}
+#target{width:36px;height:36px;border:1px solid #18211f99;box-shadow:none;pointer-events:none;background:transparent}
+#target:before,#target:after{background:#18211f}#target:before{left:12px;top:17px}#target:after{left:17px;top:12px}
+#target.locked{background:transparent;box-shadow:none}
+.gate-bottom{position:absolute;inset:auto 36px 30px;display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:24px;z-index:3;color:#bfc4c5;font-size:9px;letter-spacing:.1em;line-height:1.8;text-shadow:0 1px 10px #0008}
+.gate-caption{margin:0;max-width:260px}.gate-caption strong{display:block;color:#e1e3df;font-size:11px;font-weight:400;letter-spacing:.04em;margin-bottom:6px}
+#lock-status{font-size:8px;letter-spacing:.15em;color:#c6ccc5;text-align:center;white-space:nowrap}
+.gate-hint{text-align:right;font-size:9px;letter-spacing:.16em}
+.gate-hint span{display:block;color:#8f989c;font-size:8px;margin-top:6px}
+@media(max-width:760px){.gate-top{inset:24px 24px auto}.gate-top h1{font-size:13px}.gate-edition{font-size:8px}.scope{width:min(61vw,48svh)}.scope-label{top:25px;font-size:7px}.scope-range{bottom:25px;font-size:8px}.gate-bottom{inset:auto 24px 24px;grid-template-columns:1fr 1fr;gap:20px}.gate-caption strong{font-size:10px}.gate-caption{font-size:8px}#lock-status{position:absolute;bottom:88px;left:0;right:0;font-size:7px}.gate-hint{font-size:8px}}
+@media(max-height:500px) and (min-width:761px){.gate-top{top:20px}.gate-bottom{bottom:20px}.gate-caption{max-width:220px}.scope{width:52svh}}
+
+/* A central field of view flanked by personal tools and live status. */
+#app main{max-width:1600px;padding-top:34px}
+.observatory-layout{display:grid;grid-template-columns:220px minmax(0,1fr) 230px;gap:36px;align-items:stretch}
+.rail-label{font-size:9px;letter-spacing:.18em;color:#7e898c;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.observer-card{padding:28px 0 24px}.observer-avatar{width:48px;height:48px;border:1px solid #465047;display:grid;place-items:center;color:#cfdfc0;background:#b9d39f08;font-size:13px;margin-bottom:18px}
+.observer-card h2{font-size:19px;letter-spacing:-.04em;margin:10px 0}.observer-card p{font-size:11px;color:var(--muted);margin-bottom:22px}
+#guest-actions,#member-actions{display:grid;gap:8px}.observer-card button,.rail-menu button{width:100%;display:flex;justify-content:space-between;text-align:left;font-size:11px;padding:12px 14px}.rail-section{padding-top:26px}.rail-menu{display:grid;margin-top:10px}.rail-menu button{border:0;padding:15px 0;color:#b8c3c0;border-bottom:1px solid #26313666}.rail-menu button:hover{color:var(--green)}
+.rail-note{margin-top:40px;font-size:8px;letter-spacing:.1em;color:#a4b99a}.rail-note p{color:var(--muted);font-size:9px;letter-spacing:0}
+.observation-center{text-align:center;min-width:0;padding:8px 0 0}.observation-center h2{font-size:clamp(22px,2.5vw,36px);margin:14px 0}.observation-subtitle{font-size:10px;color:var(--muted);line-height:1.8;margin:0}
+.observation-field{position:relative;min-height:440px;display:flex;align-items:center;justify-content:center;margin-top:20px;background:radial-gradient(ellipse,#bdc9bc06,transparent 68%)}
+.control-radar{width:min(100% - 32px,360px);aspect-ratio:1;border:1px solid #78976b80;border-radius:50%;position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(circle,#16251b,#0a1410 70%);box-shadow:0 0 0 7px #0c1411,0 0 0 8px #455c4055,0 20px 60px #0005,inset 0 0 40px #020904}
+.control-radar svg{display:block;width:100%;height:100%;position:relative;z-index:1}.radar-grid{fill:none;stroke:#8bc67a;stroke-width:.6;opacity:.24}.radar-terrain{fill:#79a36e08;stroke:#85b978;stroke-width:.65;opacity:.35}.radar-contact{fill:none;stroke:#c2ff9c;stroke-width:1}.radar-contact text{fill:#b8dda4;stroke:none;font-size:7px;letter-spacing:.7px}.radar-contact .contact-history{stroke:#8fb779;opacity:.35;stroke-dasharray:2 3}.radar-contact .contact-dot{fill:#c8ff9f;stroke:none;filter:drop-shadow(0 0 3px #b4ff7b);animation:radar-return 8s linear infinite;animation-delay:var(--delay,0s)}
+.radar-scan{position:absolute;inset:0;z-index:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 0deg 285deg,#acff6710 325deg,#acff6738 359deg,transparent 360deg);animation:radar-rotation 8s linear infinite}.radar-center-dot{fill:#d3f3bd}.radar-bearings{fill:#8ea982;font-size:7px;letter-spacing:.6px}.field-coordinate{position:absolute;top:8px;left:0;right:0;font-size:8px;letter-spacing:.18em;color:#7a8783}.field-caption{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;font-size:8px;letter-spacing:.12em;color:#7a8783}
+@keyframes radar-rotation{to{transform:rotate(360deg)}}@keyframes radar-return{0%,15%{opacity:1}65%,100%{opacity:.3}}
+@media(prefers-reduced-motion:reduce){.radar-scan,.radar-contact .contact-dot{animation:none}}
+.observation-bottom{margin-top:20px;padding:16px 0 0;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:8px;color:#a1b596;letter-spacing:.1em}.observation-bottom button{font-size:10px;padding:9px 12px}.observation-bottom .dot{width:4px;height:4px}
+.connection-card{padding:26px 0}.connection-card strong{display:block;font-size:23px;font-weight:400;letter-spacing:.08em;color:var(--green);margin:12px 0 8px}.connection-card>span:last-child{font-size:10px;color:var(--muted)}
+.status-metrics{margin:0}.status-metrics>div{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:19px 0;gap:8px}.status-metrics dt{font-size:8px;letter-spacing:.1em;color:var(--muted)}.status-metrics dd{margin:0;font-size:17px}.status-metrics>div:last-child dd{font-size:10px;color:#bdcbb3}
+.field-notes p{display:flex;gap:12px;font-size:10px;color:#9eaba8;margin:18px 0}.field-notes span{font-size:8px;color:#5d7065}.status-updated{font-size:8px;letter-spacing:.08em;color:#6d8074;padding-top:18px}
+.latest-heading{display:flex;justify-content:space-between;align-items:center;margin-top:30px;border-top:1px solid var(--line)}.latest-heading button{font-size:10px;border:0;padding-right:0}.latest-heading .section-label{margin:26px 0}
+#auth-dialog{width:min(440px,calc(100vw - 32px));max-height:calc(100svh - 48px);padding:28px;background:#101618;color:var(--ink);border:1px solid #3b4944;box-shadow:0 30px 100px #0009}#auth-dialog::backdrop{background:#020608c9;backdrop-filter:blur(8px)}.auth-dialog-top{display:flex;justify-content:space-between;align-items:center}.auth-dialog-top button{border:0;padding:6px}.auth-tabs{display:flex;margin-top:20px;border-bottom:1px solid var(--line)}.auth-tabs button{border:0;flex:1;font-size:12px;color:var(--muted)}.auth-tabs button[aria-pressed=true]{border-bottom:1px solid var(--green);color:var(--green)}#auth-dialog h2{font-size:25px;margin-top:26px}#auth-description{font-size:11px}#auth-form label{margin:18px 0 8px;font-size:11px}#auth-form input{font-size:12px;padding:12px}#auth-form input::placeholder{font-size:10px}#auth-send{width:100%;margin-top:10px}.auth-footnote{font-size:10px;color:var(--muted);margin-bottom:0}#auth-message{min-height:18px;font-size:11px;color:#e0b89c;line-height:1.7}.auth-inline{border:1px solid var(--line);padding:18px;margin:20px 0;color:var(--muted);font-size:11px}.auth-inline button{padding:6px 12px;margin-left:12px}.account-byline{font-size:11px;color:var(--muted);margin:24px 0}
+@media(max-width:1100px){.observatory-layout{grid-template-columns:180px minmax(0,1fr) 185px;gap:24px}.observation-field{min-height:380px}.observation-center h2{font-size:25px}.observation-subtitle{max-width:240px;margin:auto}.field-caption{font-size:7px}.status-metrics dt{font-size:7px}}
+@media(max-width:850px){.observatory-layout{grid-template-columns:170px minmax(0,1fr)}.status-rail{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:0 30px}.status-rail>.rail-label:first-child{grid-column:1/-1}.status-rail .rail-section,.field-notes{display:none}.status-updated{grid-column:1/-1}.status-metrics>div{padding:14px 0}.observation-field{min-height:380px}}
+@media(max-width:560px){.observatory-layout{grid-template-columns:1fr;gap:30px}.observation-center{grid-row:1}.observation-field{min-height:360px}.control-radar{width:min(78vw,290px)}.observer-rail{grid-row:2}.observer-card{display:grid;grid-template-columns:48px 1fr;column-gap:16px;padding-bottom:0}.observer-avatar{grid-row:1/4}.observer-card h2{margin:6px 0}.observer-card p{margin:0 0 16px}#guest-actions,#member-actions{grid-column:1/-1;grid-template-columns:1fr 1fr}.observer-rail .rail-note{display:none}.rail-menu{grid-template-columns:1fr 1fr;gap:0 18px}.rail-menu button{font-size:10px}.status-rail{grid-row:3}.rail-section{padding-top:20px}.observation-center h2{font-size:24px}.status-rail{gap:0 20px}.observation-bottom{margin-top:12px}.latest-heading{margin-top:26px}}
 </style></head>
 <body>
 <section id="gate" aria-label="신호 연결">
-<div class="gate-top"><div class="brand">NULL <span>/</span> VECTOR</div><div class="tag muted">INDEPENDENT OBSERVATION NETWORK</div><div class="tag"><span class="dot"></span>SYSTEM ONLINE</div></div>
-<div class="gate-middle"><div class="eyebrow">SOMEWHERE BETWEEN NOTHING AND DIRECTION</div><h1>NULL <span>/</span> VECTOR</h1><p class="muted">어디에도 없는 신호. 어딘가를 향하는 기록.</p><div class="scope"><span class="scope-label">SECTOR 00 — ACQUISITION</span><div id="target"></div></div><div id="lock-status" class="tag green" role="status">ACQUIRING TARGET · 0%</div><div class="progress"><i id="progress"></i></div><button id="enter" disabled>ENTER ↗</button></div>
-<div class="gate-bottom"><span>EST. 2026<br>UNIDENTIFIED, NOT UNIMPORTANT.</span><span>OBSERVE / RECORD / CONNECT<br>COMMUNITY / SHARED SIGNALS</span></div>
+<div class="gate-coast" aria-hidden="true"></div>
+
+
+<div class="gate-top"><h1>NULL <span>/</span> VECTOR</h1><div class="gate-edition">FIELD OBSERVATIONS<br>COASTAL SECTOR / 001</div></div>
+<div class="gate-middle">
+<button class="scope" type="button" aria-label="조준경을 눌러 입장" title="클릭하여 입장">
+<span class="scope-view" aria-hidden="true"></span><span class="scope-shade" aria-hidden="true"></span><span class="scope-ticks" aria-hidden="true"></span>
+<span class="scope-label" aria-hidden="true">N · 037° 33′</span><span id="target" aria-hidden="true"></span><span class="scope-range" aria-hidden="true">126° 58′ E</span>
+</button>
+</div>
+<div class="gate-bottom"><p class="gate-caption"><strong>Somewhere beyond the known.</strong>A field journal of uncertain things.</p><div id="lock-status" role="status">FINDING FOCUS</div><div class="gate-hint">CLICK TO OBSERVE<span>OBSERVE / RECORD / CONNECT</span></div></div>
 </section>
 <div id="app" hidden>
 <header><div class="brand">NULL <span>/</span> VECTOR</div><nav aria-label="주 메뉴"><button data-page="dashboard" aria-current="page">01 / OBSERVATORY</button><button data-page="archive">02 / ARCHIVE</button><button data-page="submit">03 / NEW RECORD</button></nav><div class="tag header-status"><span class="dot"></span>LIVE <span id="clock"></span></div></header>
 <main>
-<section id="dashboard" class="page"><div class="page-title"><div><div class="eyebrow">01 / THE OBSERVATORY</div><h2>불확실한 것들을 관측합니다.</h2><p class="muted">흩어진 신호와 이름 없는 발견의 기록.</p></div><span class="tag green">● RECEIVING SIGNALS</span></div><div class="layout"><div class="panel"><div class="panel-head"><span>SECTOR SCAN / 360°</span><span class="green">TRACKING ACTIVE</span></div><div class="radar" aria-label="신호 관측 레이더"><div class="sweep"></div><i class="blip" style="left:61%;top:27%"></i><i class="blip" style="left:29%;top:61%"></i><i class="blip" style="left:72%;top:67%"></i></div><div class="coordinates"><span>37° 33′ 59.0″ N</span><span>126° 58′ 41.0″ E</span><span>RANGE / ∞</span></div></div><div><div class="stats"><div class="stat"><span class="tag muted">ARCHIVED SIGNALS</span><strong id="record-count">003</strong></div><div class="stat"><span class="tag muted">NETWORK STATUS</span><strong class="green">ONLINE</strong></div></div><div class="panel"><div class="panel-head"><span>FREQUENCY MONITOR</span><span class="green">1420.4 MHz</span></div><svg class="wave" viewBox="0 0 500 100" preserveAspectRatio="none" aria-label="신호 파형"><path d="M0 50H30L35 44 40 58 45 50H65L70 35 75 70 80 50H110L115 45 120 55 125 50H150L155 20 160 85 165 5 170 95 175 35 180 50H210L215 43 220 57 225 50H265L270 30 275 70 280 50H310L315 40 320 60 325 50H350L355 15 360 85 365 30 370 50H400L405 45 410 55 415 50H455L460 35 465 65 470 50H500" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><div class="log-line"><time>SYS.01</time><span>관측 시스템 초기화 완료</span></div><div class="log-line"><time>SYS.02</time><span>타겟 고정 · 접근 승인</span></div><div class="log-line"><time>SYS.03</time><span class="green">새로운 기록을 기다리는 중_</span></div></div></div></div><div class="section-label">LATEST TRANSMISSIONS <span class="muted">/ 최근 기록</span></div><div id="latest" class="cards"></div></section>
-<section id="archive" class="page" hidden><div class="page-title"><div><div class="eyebrow">02 / SIGNAL ARCHIVE</div><h2>사라지기 전에, 기록.</h2><p class="muted">관측된 순간과 그 너머의 이야기들.</p></div></div><div class="toolbar"><input id="search" type="search" aria-label="기록 검색" placeholder="제목, 내용 또는 분류 검색..."><button class="primary" data-page="submit">+ NEW RECORD</button></div><div id="archive-list" class="cards"></div></section>
-<section id="submit" class="page" hidden><div class="eyebrow">03 / TRANSMIT A SIGNAL</div><h2>당신은 무엇을 발견했나요?</h2><p class="muted">작은 이상 징후도 하나의 좌표가 됩니다.</p><form id="record-form"><label for="title">01 / 기록 제목</label><input id="title" required maxlength="100" placeholder="신호에 이름을 붙여 주세요"><label for="category">02 / 분류</label><select id="category"><option>OBSERVATION</option><option>THOUGHT</option><option>DISCOVERY</option></select><label for="body">03 / 관측 내용</label><textarea id="body" required maxlength="10000" placeholder="언제, 어디서, 무엇을 관측했나요?"></textarea><div class="form-actions"><button class="primary" type="submit">SAVE RECORD ↗</button><span class="tag muted">SHARED ARCHIVE</span></div><p class="muted">글과 댓글은 공개되며 Cloudflare 데이터베이스에 저장됩니다. 닉네임은 인증되지 않으므로 사칭에 유의하고 개인정보를 작성하지 마세요.</p><p id="notice" role="status"></p></form></section>
+<section id="dashboard" class="page">
+<div class="observatory-layout">
+<aside class="observer-rail" aria-label="계정 및 메뉴">
+<div class="rail-label">01 / OBSERVER</div>
+<div class="observer-card"><div class="observer-avatar" id="observer-avatar">N/V</div><span class="tag muted" id="observer-role">GUEST OBSERVER</span><h2 id="observer-name">Welcome, stranger.</h2><p id="observer-description">관측을 시작하고 나만의 기록을 남겨보세요.</p>
+<div id="guest-actions"><button type="button" class="primary" data-auth="signup">회원가입 <span>↗</span></button><button type="button" data-auth="login">로그인 <span>→</span></button></div>
+<div id="member-actions" hidden><button type="button" data-mine>내 기록 <span>↗</span></button><button type="button" id="logout">로그아웃 <span>→</span></button></div></div>
+<div class="rail-label rail-section">EXPLORE</div><div class="rail-menu"><button type="button" data-page="archive"><span>공유 아카이브</span><span>↗</span></button><button type="button" data-mine><span>내 기록</span><span>↗</span></button><button type="button" data-page="submit"><span>새 기록 남기기</span><span>＋</span></button></div>
+<div class="rail-note"><span class="dot"></span>STAY CURIOUS.<p>Observe what others overlook.</p></div>
+</aside>
+<div class="observation-center">
+<div class="eyebrow">THE OBSERVATORY / SECTOR 001</div><h2>We observe the uncertain.</h2><p class="observation-subtitle">A record of scattered signals and unnamed discoveries.</p>
+<div class="observation-field"><div class="field-coordinate">SURVEILLANCE RADAR / 360°</div>
+<div class="control-radar" role="img" aria-label="관제 레이더 시각 효과: 회전하는 스캔과 가상의 신호 위치"><span class="radar-scan" aria-hidden="true"></span>
+<svg viewBox="0 0 360 360" aria-hidden="true" focusable="false">
+<g class="radar-grid"><circle cx="180" cy="180" r="42"/><circle cx="180" cy="180" r="84"/><circle cx="180" cy="180" r="126"/><circle cx="180" cy="180" r="166"/><path d="M180 14v332M14 180h332M62.6 62.6l234.8 234.8M62.6 297.4 297.4 62.6"/><path d="M180 14v6M346 180h-6M180 346v-6M14 180h6"/></g>
+<g class="radar-terrain"><path d="M17 128 38 119 47 99 68 105 79 124 73 149 91 165 85 187 103 207 90 226 64 233 59 258 38 266M33 142 50 137 61 146 60 171 75 192 69 212 49 220"/><path d="m265 65 22 8 15 21-7 24-17 3-15-17 2-16-9-10Z"/><path d="m242 274 19-10 25 5 14 14-8 12-29-4Z"/></g>
+<g class="radar-bearings" text-anchor="middle"><text x="180" y="30">000</text><text x="330" y="183">090</text><text x="180" y="336">180</text><text x="30" y="183">270</text><text x="194" y="140">20</text><text x="194" y="98">40</text><text x="194" y="56">60</text></g>
+<g class="radar-contact" transform="translate(230 97)" style="--delay:-1s"><path class="contact-history" d="M-30 36-10 12"/><path d="M-4 0h8M0-4v8M4-4l9-12"/><circle class="contact-dot" r="2.5"/><text x="17" y="-15">NV-01</text></g>
+<g class="radar-contact" transform="translate(121 220)" style="--delay:-5s"><path class="contact-history" d="M-28 20-9 6"/><path d="M-4 0h8M0-4v8M4-4l10-12"/><circle class="contact-dot" r="2.5"/><text x="18" y="-15">NV-02</text></g>
+<g class="radar-contact" transform="translate(258 237)" style="--delay:-3s"><path class="contact-history" d="M22 33 6 9"/><path d="M-4 0h8M0-4v8M-4-4l-8-12"/><circle class="contact-dot" r="2.5"/><text x="-47" y="-18">NV-03</text></g>
+<circle class="radar-center-dot" cx="180" cy="180" r="2"/>
+</svg></div><div class="field-caption"><span>SECTOR 001 / VISUAL SIMULATION</span><span>RANGE / 80 NM</span></div></div>
+<div class="observation-bottom"><span><i class="dot"></i>SECTOR SCAN ACTIVE</span><button type="button" data-page="submit">관측 기록하기 ↗</button></div>
+</div>
+<aside class="status-rail" aria-label="현재 상태"><div class="rail-label">02 / FIELD STATUS</div>
+<div class="connection-card"><span class="tag muted">CONNECTION</span><strong id="network-status">CONNECTING</strong><span id="network-detail">서버 연결 확인 중</span></div>
+<dl class="status-metrics"><div><dt>SHARED RECORDS</dt><dd id="record-count">—</dd></div><div><dt>MY RECORDS</dt><dd id="my-record-count">—</dd></div><div><dt>SESSION</dt><dd id="session-status">GUEST</dd></div></dl>
+<div class="rail-label rail-section">OBSERVATION NOTES</div><div class="field-notes"><p><span>01</span>안개 속에서도 방향을 찾습니다.</p><p><span>02</span>작은 발견을 기록합니다.</p><p><span>03</span>서로의 시선을 나눕니다.</p></div><div id="status-updated" class="status-updated" role="status">WAITING FOR SIGNAL</div></aside>
+</div>
+<div class="latest-heading"><div class="section-label">LATEST TRANSMISSIONS <span class="muted">/ 최근 기록</span></div><button type="button" data-page="archive">전체 보기 ↗</button></div><div id="latest" class="cards"></div>
+</section>
+<section id="archive" class="page" hidden><div class="page-title"><div><div class="eyebrow">02 / SIGNAL ARCHIVE</div><h2 id="archive-heading">사라지기 전에, 기록.</h2><p class="muted">관측된 순간과 그 너머의 이야기들.</p></div></div><div class="toolbar"><input id="search" type="search" aria-label="기록 검색" placeholder="제목, 내용 또는 분류 검색..."><button class="primary" data-page="submit">+ NEW RECORD</button></div><div id="archive-list" class="cards"></div></section>
+<section id="submit" class="page" hidden><div class="eyebrow">03 / TRANSMIT A SIGNAL</div><h2>당신은 무엇을 발견했나요?</h2><p class="muted">작은 이상 징후도 하나의 좌표가 됩니다.</p><form id="record-form"><label for="title">01 / 기록 제목</label><input id="title" required maxlength="100" placeholder="신호에 이름을 붙여 주세요"><label for="category">02 / 분류</label><select id="category"><option>OBSERVATION</option><option>THOUGHT</option><option>DISCOVERY</option></select><label for="body">03 / 관측 내용</label><textarea id="body" required maxlength="10000" placeholder="언제, 어디서, 무엇을 관측했나요?"></textarea><div class="form-actions"><button class="primary" type="submit">SAVE RECORD ↗</button><span class="tag muted">SHARED ARCHIVE</span></div><p class="muted">로그인한 계정의 닉네임으로 글이 공개됩니다. 개인정보는 작성하지 마세요.</p><p id="notice" role="status"></p></form></section>
 </main><footer class="site-footer"><span>© 2026 NULL / VECTOR — INDEPENDENT OBSERVATION NETWORK</span><span>STAY CURIOUS. KEEP RECORDING. ↗</span></footer>
 </div>
+<dialog id="auth-dialog" aria-labelledby="auth-heading">
+<div class="auth-dialog-top"><span class="tag muted">OBSERVER ACCESS</span><button type="button" id="auth-close" aria-label="닫기">✕</button></div>
+<div class="auth-tabs" role="group" aria-label="계정 메뉴"><button type="button" data-auth-tab="signup">회원가입</button><button type="button" data-auth-tab="login">로그인</button></div>
+<h2 id="auth-heading">관측자가 되어보세요.</h2><p class="muted" id="auth-description">계정을 만들고 발견을 기록하세요.</p>
+<form id="auth-form"><label for="auth-username">아이디</label><input id="auth-username" name="username" required minlength="3" maxlength="24" pattern="[a-z0-9_]{3,24}" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="영문 소문자, 숫자, 밑줄 3~24자">
+<div id="auth-nickname-field"><label for="auth-nickname">닉네임</label><input id="auth-nickname" name="nickname" required maxlength="30" autocomplete="nickname" placeholder="기록에 표시할 이름"></div>
+<label for="auth-password">비밀번호</label><input id="auth-password" name="password" type="password" required minlength="10" maxlength="128" autocomplete="new-password" placeholder="10자 이상">
+<div id="auth-confirm-field"><label for="auth-confirm">비밀번호 확인</label><input id="auth-confirm" type="password" required minlength="10" maxlength="128" autocomplete="new-password" placeholder="비밀번호를 한 번 더 입력하세요"></div>
+<p id="auth-message" role="status"></p><button class="primary" type="submit" id="auth-send">계정 만들기 ↗</button></form><p class="auth-footnote">아이디와 비밀번호를 기억해 주세요. 비밀번호 재설정은 아직 지원하지 않습니다.</p>
+</dialog>
 <script>
 'use strict';
-const LOCK_DURATION = 5600;
+const LOCK_DURATION = 1400;
 const target = document.getElementById('target');
-const enter = document.getElementById('enter');
+const scope = document.querySelector('.scope');
+const gate = document.getElementById('gate');
+const coast = document.querySelector('.gate-coast');
+const lens = document.querySelector('.scope-view');
+const landscape = new Image();
+let coastFrame = null;
+function moveSight(x, y) {
+  scope.style.transform = `translate(${x}px, ${y}px)`;
+  if (!coastFrame) return;
+  lens.style.backgroundSize = `${coastFrame.width}px ${coastFrame.height}px`;
+  lens.style.backgroundPosition = `${coastFrame.x - scope.offsetLeft - scope.clientLeft - x}px ${coastFrame.y - scope.offsetTop - scope.clientTop - y}px`;
+}
+function frameCoast() {
+  if (!landscape.naturalWidth || gate.hidden) return;
+  const width = gate.clientWidth, height = gate.clientHeight;
+  const scale = Math.max(width / landscape.naturalWidth, height / landscape.naturalHeight) * 1.45;
+  const imageWidth = landscape.naturalWidth * scale;
+  const imageHeight = landscape.naturalHeight * scale;
+  // Place the misty headland and waterline under the sight, across screen sizes.
+  const centerX = scope.offsetLeft + scope.offsetWidth / 2;
+  const centerY = scope.offsetTop + scope.offsetHeight / 2;
+  const x = Math.max(width - imageWidth, Math.min(0, centerX - imageWidth * .35));
+  const y = Math.max(height - imageHeight, Math.min(0, centerY - imageHeight * .70));
+  coast.style.backgroundSize = `${imageWidth}px ${imageHeight}px`;
+  coast.style.backgroundPosition = `${x}px ${y}px`;
+  coastFrame = {x, y, width:imageWidth, height:imageHeight};
+  moveSight(0, 0);
+}
+landscape.addEventListener('load', frameCoast);
+landscape.src = '/assets/coast-gray.jpg';
+new ResizeObserver(frameCoast).observe(gate);
+document.fonts.ready.then(frameCoast);
+
 const status = document.getElementById('lock-status');
-const progress = document.getElementById('progress');
 const started = performance.now();
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let locked = false;
+function lockTarget() {
+  moveSight(0, 0);
+  target.classList.add('locked');
+  status.textContent = 'IN FOCUS · READY TO OBSERVE';
+  locked = true;
+}
 function animate(now) {
+  if (locked) return;
   const elapsed = now - started;
-  const ratio = Math.min(elapsed / LOCK_DURATION, 1);
+  const ratio = reducedMotion ? 1 : Math.min(elapsed / LOCK_DURATION, 1);
   if (ratio < 1) {
-    const amplitude = 30 * (1 - ratio * .7);
-    target.style.left = (50 + (reducedMotion ? 0 : Math.sin(elapsed / 370) * amplitude)) + '%';
-    target.style.top = (50 + (reducedMotion ? 0 : Math.cos(elapsed / 510) * amplitude)) + '%';
-    progress.style.width = (ratio * 100) + '%';
-    status.textContent = 'ACQUIRING TARGET · ' + Math.floor(ratio * 100) + '%';
+    // Smoothly settle the whole sight without moving the reticle inside it.
+    const envelope = Math.sin(Math.PI * ratio) ** 2;
+    const x = Math.sin(ratio * Math.PI * 2) * 28 * envelope;
+    const y = Math.sin(ratio * Math.PI * 3) * 16 * envelope;
+    moveSight(x, y);
+    status.textContent = 'FINDING FOCUS';
     requestAnimationFrame(animate);
   } else {
-    target.style.left = '50%'; target.style.top = '50%';
-    target.classList.add('locked'); progress.style.width = '100%';
-    status.textContent = 'TARGET LOCKED · ACCESS GRANTED';
-    locked = true; enter.disabled = false;
+    lockTarget();
   }
 }
 requestAnimationFrame(animate);
-enter.addEventListener('click', () => {
+function enterApp() {
   if (!locked) return;
   document.getElementById('gate').hidden = true;
   document.getElementById('app').hidden = false;
   document.querySelector('nav button').focus();
+}
+scope.addEventListener('click', () => {
+  lockTarget();
+  enterApp();
 });
 </script><script src="community.js" defer></script></body></html>

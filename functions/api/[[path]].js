@@ -1,3 +1,4 @@
+import {authRoute,currentUser} from '../_lib/auth.js';
 const categories = new Set(['OBSERVATION', 'THOUGHT', 'DISCOVERY']);
 const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers: {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const text = (value, max) => typeof value === 'string' && value.trim().length > 0 && value.trim().length <= max ? value.trim() : null;
@@ -7,13 +8,39 @@ export async function onRequest({request, env}) {
   const path = url.pathname;
   if (!env.DB) return json({error:'데이터베이스가 연결되지 않았습니다. Cloudflare에서 DB 바인딩을 설정해 주세요.'},503);
   try {
+    let data;
+    if (request.method === 'POST') {
+      const allowedOrigins = new Set([url.origin]);
+      for (const value of (env.ALLOWED_ORIGINS || '').split(',')) {
+        try { const origin = new URL(value.trim()); if (origin.protocol === 'https:' && origin.origin === value.trim()) allowedOrigins.add(origin.origin); } catch {}
+      }
+      if (!allowedOrigins.has(request.headers.get('Origin'))) return json({error:'허용되지 않은 요청입니다.'},403);
+      if (!(request.headers.get('Content-Type') || '').startsWith('application/json')) return json({error:'JSON 요청이 필요합니다.'},415);
+      const raw = await request.text();
+      if (new TextEncoder().encode(raw).length > 20000) return json({error:'내용이 너무 깁니다.'},413);
+      try { data = JSON.parse(raw); } catch { return json({error:'올바르지 않은 요청입니다.'},400); }
+      if (!data || typeof data !== 'object') return json({error:'올바르지 않은 요청입니다.'},400);
+    }
+    if (request.method === 'GET' && path === '/api/auth/me') return await authRoute(request,env.DB,path,null,json);
+    if (request.method === 'POST' && ['/api/auth/signup','/api/auth/login','/api/auth/logout'].includes(path)) return await authRoute(request,env.DB,path,data,json);
+    if (request.method === 'GET' && path === '/api/status') {
+      const user = await currentUser(request,env.DB);
+      const counts = await env.DB.prepare('SELECT COUNT(*) AS total FROM posts').first();
+      const mine = user ? await env.DB.prepare('SELECT COUNT(*) AS total FROM posts WHERE user_id=?').bind(user.id).first() : null;
+      return json({online:true,total:counts.total,mine:mine?.total ?? 0,user});
+    }
     if (request.method === 'GET' && path === '/api/posts') {
       const offset = Math.min(Math.max(Number.parseInt(url.searchParams.get('offset') || '0',10) || 0,0),1000000);
       const q = (url.searchParams.get('q') || '').trim().slice(0,100);
       const pattern = '%' + q.replace(/[\\%_]/g, '\\$&') + '%';
-      const where = "WHERE title LIKE ? ESCAPE '\\' OR body LIKE ? ESCAPE '\\' OR category LIKE ? ESCAPE '\\'";
-      const rows = await env.DB.prepare(`SELECT id,title,body,author,category,created_at, (SELECT COUNT(*) FROM comments WHERE post_id=posts.id) AS comment_count FROM posts ${where} ORDER BY created_at DESC,id DESC LIMIT 21 OFFSET ?`).bind(pattern,pattern,pattern,offset).all();
-      const total = await env.DB.prepare(`SELECT COUNT(*) AS total FROM posts ${where}`).bind(pattern,pattern,pattern).first();
+      const mine = url.searchParams.get('mine') === '1';
+      const user = mine ? await currentUser(request,env.DB) : null;
+      if (mine && !user) return json({error:'로그인이 필요합니다.'},401);
+      const params = [pattern,pattern,pattern];
+      if (mine) params.push(user.id);
+      const where = "WHERE (title LIKE ? ESCAPE '\\' OR body LIKE ? ESCAPE '\\' OR category LIKE ? ESCAPE '\\')" + (mine ? " AND user_id=?" : "");
+      const rows = await env.DB.prepare(`SELECT id,title,body,author,category,created_at, (SELECT COUNT(*) FROM comments WHERE post_id=posts.id) AS comment_count FROM posts ${where} ORDER BY created_at DESC,id DESC LIMIT 21 OFFSET ?`).bind(...params,offset).all();
+      const total = await env.DB.prepare(`SELECT COUNT(*) AS total FROM posts ${where}`).bind(...params).first();
       return json({posts:rows.results.slice(0,20),hasMore:rows.results.length>20,total:total.total});
     }
     const match = path.match(/^\/api\/posts\/([a-f0-9-]{36})\/comments$/);
@@ -25,17 +52,9 @@ export async function onRequest({request, env}) {
     }
     if (request.method !== 'POST') return json({error:'지원하지 않는 요청입니다.'},404);
     if (path !== '/api/posts' && !match) return json({error:'주소를 찾을 수 없습니다.'},404);
-    const allowedOrigins = new Set([url.origin]);
-    for (const value of (env.ALLOWED_ORIGINS || '').split(',')) {
-      try { const origin = new URL(value.trim()); if (origin.protocol === 'https:' && origin.origin === value.trim()) allowedOrigins.add(origin.origin); } catch {}
-    }
-    if (!allowedOrigins.has(request.headers.get('Origin'))) return json({error:'허용되지 않은 요청입니다.'},403);
-    if (!(request.headers.get('Content-Type') || '').startsWith('application/json')) return json({error:'JSON 요청이 필요합니다.'},415);
-    const raw = await request.text();
-    if (new TextEncoder().encode(raw).length > 20000) return json({error:'내용이 너무 깁니다.'},413);
-    let data; try { data = JSON.parse(raw); } catch { return json({error:'올바르지 않은 요청입니다.'},400); }
-    if (!data || typeof data !== 'object') return json({error:'올바르지 않은 요청입니다.'},400);
-    const author = text(data.author,30), body = text(data.body,match ? 2000 : 10000);
+    const user = await currentUser(request,env.DB);
+    if (!user) return json({error:'글과 댓글을 작성하려면 로그인해 주세요.'},401);
+    const author = user.nickname, body = text(data.body,match ? 2000 : 10000);
     const title = text(data.title,100);
     if (!author || !body || (!match && (!title || !categories.has(data.category)))) return json({error:'닉네임과 내용을 확인해 주세요. 제목은 100자, 본문은 10,000자, 댓글은 2,000자까지입니다.'},400);
     if (match) {
@@ -51,8 +70,8 @@ export async function onRequest({request, env}) {
     const gate = await env.DB.prepare('INSERT INTO write_limits (key,last_at) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET last_at=excluded.last_at WHERE write_limits.last_at <= ? RETURNING key').bind(key,now,now-15000).first();
     if (!gate) return json({error:'잠시 후 다시 작성해 주세요. 작성 간격은 15초입니다.'},429);
     const id = crypto.randomUUID(), created_at = new Date().toISOString();
-    if (match) await env.DB.prepare('INSERT INTO comments(id,post_id,author,body,created_at) VALUES (?,?,?,?,?)').bind(id,match[1],author,body,created_at).run();
-    else await env.DB.prepare('INSERT INTO posts(id,title,body,author,category,created_at) VALUES (?,?,?,?,?,?)').bind(id,title,body,author,data.category,created_at).run();
+    if (match) await env.DB.prepare('INSERT INTO comments(id,post_id,author,body,created_at,user_id) VALUES (?,?,?,?,?,?)').bind(id,match[1],author,body,created_at,user.id).run();
+    else await env.DB.prepare('INSERT INTO posts(id,title,body,author,category,created_at,user_id) VALUES (?,?,?,?,?,?,?)').bind(id,title,body,author,data.category,created_at,user.id).run();
     await env.DB.prepare('DELETE FROM write_limits WHERE last_at < ?').bind(now-86400000).run();
     return json({id,created_at},201);
   } catch (error) {
