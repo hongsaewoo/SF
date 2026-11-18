@@ -2,9 +2,11 @@
 
 ## Vercel 무료 주소 연결
 
-Vercel에서 Add New → Project → `hongsaewoo/SF` Import를 선택하고 **Root Directory를 `vercel-proxy`**로 설정한 뒤 Deploy합니다. 프레임워크는 Other이며 빌드/출력은 폴더 안 vercel.json 설정을 사용합니다. 사이트 및 API 전체를 `https://sf.hongsaewoo.workers.dev`로 전달하므로 DB는 Cloudflare D1에 그대로 둡니다. 이 프로젝트에 D1_DATABASE_ID나 Cloudflare 토큰을 넣을 필요는 없습니다.
+Vercel에서 Add New → Project → `hongsaewoo/SF` Import를 선택합니다. **Root Directory는 저장소 루트(기본값)**, Framework Preset은 **Other**로 둡니다. 루트의 `vercel.json`이 `node vercel-proxy/build.mjs`와 출력 `public`, 전체 경로 프록시 규칙을 설정합니다. 기존에 Root Directory를 `vercel-proxy`로 설정한 프로젝트도 폴더 안의 동일한 프록시 설정을 계속 사용할 수 있습니다. 사이트 및 API 전체를 `https://sf.hongsaewoo.workers.dev`로 전달하므로 DB는 Cloudflare D1에 그대로 둡니다. Vercel 프로젝트에 D1_DATABASE_ID나 Cloudflare 토큰을 넣을 필요는 없습니다.
 
-Vercel 배포 후 확정된 프로덕션 주소(예: `https://선택한이름.vercel.app`, 끝에 / 없이)를 Cloudflare `sf`의 **빌드 변수 `ALLOWED_ORIGINS`**로 추가하고 재배포하세요. `D1_DATABASE_ID`는 기존 값을 유지합니다. 여러 주소는 쉼표로 구분합니다. 등록된 정확한 HTTPS 주소만 글/댓글 작성을 허용하며 모든 vercel.app 주소를 허용하지 않습니다. 미리보기 주소는 자동 허용되지 않습니다.
+Vercel에서 Ready인데 `404 NOT_FOUND`가 나오면 해당 프로젝트의 **Settings → Build and Deployment**에서 Root Directory가 루트 또는 `vercel-proxy`인지 확인하고, Build Command/Output Directory의 대시보드 Override를 해제해 vercel.json 값을 사용하세요. 그 후 수정 커밋이 포함된 최신 main 배포를 생성하세요. 코드 커밋이 바뀌기 전의 과거 배포를 재실행하면 새 설정 파일이 포함되지 않습니다.
+
+Vercel 배포 후 확정된 프로덕션 주소(예: `https://null-vector-pi.vercel.app`, 끝에 / 없이)를 Cloudflare `sf`의 **빌드 변수 `ALLOWED_ORIGINS`**로 추가하고 재배포하세요. `D1_DATABASE_ID`는 기존 값을 유지합니다. 여러 주소는 쉼표로 구분합니다. 등록된 정확한 HTTPS 주소만 글/댓글 작성을 허용하며 모든 vercel.app 주소를 허용하지 않습니다. 미리보기 주소는 자동 허용되지 않습니다.
 
 Vercel 주소에서 목록/검색과 글/댓글 저장을 확인하세요. 프록시를 거치면 Cloudflare에서 보는 IP가 Vercel 서버 IP이므로 15초 작성 제한이 여러 방문자에게 함께 적용될 수 있습니다. 사용자 IP 헤더를 검증 없이 신뢰하지 않기 위한 현재 제한입니다. 실제 Vercel 배포 및 전달 헤더 동작은 계정 배포 후 검증해야 합니다.
 
