@@ -12,11 +12,11 @@ Vercel 주소에서 목록/검색과 글/댓글 저장을 확인하세요. 프�
 
 기존 프로젝트가 Workers라면 아래 설정을 사용합니다. 아래의 Pages 안내는 별도 Pages 프로젝트에만 해당합니다.
 
-1. D1에서 `null-vector-community`를 만들고 Console에서 `migrations/0001_community.sql`을 실행합니다.
+1. D1에서 `null-vector-community`를 만듭니다. 아래 자동 배포 명령을 사용하면 필요한 게시판·계정 스키마는 배포 시 생성됩니다.
 2. D1 화면의 Database ID(UUID)를 복사합니다. API 토큰이나 계정 ID가 아닙니다.
 3. Workers 프로젝트 `sf` → Settings → Build의 빌드 변수에 `D1_DATABASE_ID`를 추가하고 복사한 UUID를 값으로 설정합니다. 런타임 변수가 아닌 빌드 환경 변수입니다.
 4. 빌드 명령: `node build.mjs`
-5. 배포 명령: `npx wrangler deploy --config wrangler.deploy.json`
+5. 배포 명령: `node deploy.mjs` (DB 스키마 확인·업데이트 후 Worker 배포). 빌드에 사용하는 API 토큰에 해당 계정의 **D1 Edit** 권한도 추가하세요.
 6. 루트 디렉터리는 기본값(저장소 루트), 브랜치는 `main`으로 두고 재배포합니다. Workers에는 Pages의 출력 디렉터리 설정이 필요하지 않습니다.
 7. `https://sf.hongsaewoo.workers.dev/api/posts`에서 JSON 응답을 확인합니다.
 
@@ -65,10 +65,28 @@ Pages + Pages Functions + D1을 사용합니다. 외부 DB 서비스는 필요 �
 
 ### DB 적용
 
-기존 운영 D1에는 **배포 전에 `migrations/0002_accounts.sql`을 한 번 적용**해야 합니다. 새 DB에는 0001, 0002 순서로 적용합니다. 0002의 ALTER TABLE 문은 중복 실행하지 마세요. 원격 DB에는 아직 적용하지 않았습니다.
+Workers에서 아래 자동 배포 설정을 사용하면 SQL을 Console에 직접 붙여넣지 않아도 됩니다. 수동 배포를 유지한다면 기존 운영 D1에 `migrations/0002_accounts.sql`을 한 번 적용해야 합니다. 수동 SQL의 ALTER TABLE 문은 중복 실행하지 마세요. 원격 DB에는 여기서 직접 접속하거나 적용하지 않았습니다.
 
 Node.js 22.13 이상에서 로컬 서버는 `node dev-server.mjs`로 실행합니다. 로컬 SQLite의 마이그레이션 적용 내역을 관리하며 재시작 시 중복 실행하지 않습니다. 로컬 계정은 `.wrangler/local.sqlite`에 저장되며 운영 DB와 분리됩니다.
 
 검증: `node test-community.mjs` (가입/중복/비밀번호/세션 만료·회전·로그아웃/작성자 위조 방지/내 기록 격리/작성 제한/검색/페이지 처리).
 
 구현 참고: [Cloudflare Web Crypto](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/), [Workers PBKDF2 제한](https://github.com/cloudflare/workerd/issues/1346), [쿠키 속성](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie).
+
+## Workers 자동 배포 — 계정 소유자가 한 번 설정
+
+Cloudflare **Workers & Pages → sf → Settings → Builds**에서:
+
+1. Git 저장소 `hongsaewoo/SF`, 프로덕션 브랜치 `main`을 연결합니다.
+2. 빌드 명령은 `node build.mjs`, 프로덕션 배포 명령은 **`node deploy.mjs`**로 설정합니다.
+3. 기존 빌드 변수 `D1_DATABASE_ID`를 유지합니다. `ALLOWED_ORIGINS`도 기존 값을 유지합니다.
+4. Builds에서 사용하는 API 토큰에 **Account → D1 → Edit** 권한이 있는지 확인합니다. 기본 자동 생성 토큰에는 D1 권한이 포함되지 않으므로, 계정 소유자가 **My Profile → API Tokens**에서 해당 빌드 토큰에 권한을 추가해야 합니다. 토큰 값 자체를 GitHub나 대화에 공유할 필요는 없습니다.
+5. 설정 변경 후 최신 `main`을 빌드·배포합니다. 이후 GitHub main 푸시가 빌드를 시작합니다.
+
+`deploy.mjs`는 0001의 게시판 스키마를 확보하고, 운영 DB의 posts/comments 컬럼을 조회한 뒤 0002의 계정 스키마와 없는 user_id 컬럼만 적용합니다. Console로 이미 0002를 적용했거나 일부 컬럼만 적용한 DB도 다시 실행할 수 있습니다. 기존 글·회원 데이터를 삭제하지 않습니다. DB 작업 실패·권한 부족·잘못된 설정 시 Worker 배포를 중단합니다.
+
+이 스크립트는 현재 저장소의 0001/0002 스키마를 자동 준비합니다. 추후 다른 DB 변경 파일을 추가할 때에는 배포 스크립트에도 해당 변경을 연결해야 합니다. 프로덕션 배포용이며 별도 미리보기 배포 명령은 유지하세요. Workers Builds의 `WORKERS_CI_BRANCH`가 main이 아니면 실행을 중단합니다.
+
+로컬 검증: `node test-deploy.mjs`는 원격 연결 없이 새 DB, 기존 DB, 일부 적용, 수동 적용, 재실행, 데이터 보존과 실패 시 배포 중단을 확인합니다. 실제 Cloudflare 배포 검증은 계정 소유자의 최초 설정 후 필요합니다.
+
+공식 문서: [Workers Builds 설정·토큰 권한](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/), [D1 SQL 실행 명령](https://developers.cloudflare.com/d1/wrangler-commands/#d1-execute).
