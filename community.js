@@ -123,19 +123,69 @@ async function load(append=false) {
   finally {if(version===requestVersion)loadMore.disabled=false;}
 }
 async function openPost(post) {
-  selected=post.id; showPage('detail');
-  const back=element('button','← 아카이브'); back.addEventListener('click',()=>{showPage('archive',onlyMine);load();});
-  const content=element('article',undefined,'panel'); const body=element('p',post.body);body.style.whiteSpace='pre-wrap';body.style.overflowWrap='anywhere';
-  content.append(element('span',post.category,'tag green'),element('h2',post.title),element('p',post.author+' · '+post.created_at.slice(0,10),'muted'),body);
-  const comments=element('div');const message=element('p','댓글 불러오는 중…','muted'); message.role='status';
-  const form=element('form');const nameLabel=element('label','작성자');nameLabel.htmlFor='comment-author';
+  selected=post.id;
+  showPage('detail');
+  const back=element('button','← 아카이브','detail-back');
+  back.type='button';
+  back.addEventListener('click',()=>{showPage('archive',onlyMine);load();});
+  const toolbar=element('div',undefined,'detail-toolbar');
+  toolbar.append(back,element('span','ARCHIVE / TRANSMISSION '+post.id.slice(0,8).toUpperCase()));
+
+  const content=element('article',undefined,'hud-panel transmission-panel');
+  const topline=element('div',undefined,'transmission-topline');
+  topline.append(element('span','INCOMING RECORD'),element('span',post.category,'green'));
+  const heading=element('h2',post.title);heading.tabIndex=-1;
+  const body=element('p',post.body,'transmission-body');
+  content.append(topline,heading,element('p',post.author+' / '+post.created_at.slice(0,10),'transmission-byline'),body,element('div','END OF TRANSMISSION','transmission-end'));
+
+  const recordData=element('aside',undefined,'hud-panel record-data');
+  recordData.setAttribute('aria-label','기록 정보');
+  const metadata=element('dl');
+  function field(label,value){const row=element('div');row.append(element('dt',label),element('dd',value));return row;}
+  metadata.append(field('OBSERVER / 작성자',post.author),field('CATEGORY / 분류',post.category),field('RECORDED / 작성일',post.created_at.slice(0,10)),field('RECORD ID',post.id));
+  recordData.append(element('h3','RECORD DATA / 01'),metadata,element('p','하나의 발견이 또 다른 관측의 시작이 됩니다.','record-data-note'));
+  const layout=element('div',undefined,'detail-layout');layout.append(content,recordData);
+
+  const discussion=element('section',undefined,'hud-panel discussion-panel');
+  discussion.setAttribute('aria-label','댓글');
+  const discussionHeading=element('div',undefined,'discussion-heading');
+  const count=element('span','RESPONSES / —');
+  discussionHeading.append(element('h3','댓글'),count);
+  const comments=element('div',undefined,'comment-list');
+  const message=element('p','댓글 불러오는 중…','comment-message');message.role='status';
+  const form=element('form',undefined,'comment-compose');
+  const nameLabel=element('label','작성자');nameLabel.htmlFor='comment-author';
   const name=element('input');name.id='comment-author';name.required=true;name.maxLength=30;name.value=authorInput.value;name.readOnly=true;
-  const bodyLabel=element('label','댓글');bodyLabel.htmlFor='comment-body';const input=element('textarea');input.id='comment-body';input.required=true;input.maxLength=2000;
-  const send=element('button','댓글 등록','primary');send.type='submit';send.disabled=!observer;
-  if(!observer){const login=element('button','로그인하고 댓글 쓰기');login.type='button';login.addEventListener('click',()=>openAuth('login'));form.append(login);}form.append(nameLabel,name,bodyLabel,input,send);
-  detail.replaceChildren(back,content,element('h3','댓글 (최대 200개 표시)'),comments,message,form);
-  async function reloadComments() {const result=await api('/posts/'+post.id+'/comments');if(selected!==post.id)return;comments.replaceChildren(...result.comments.map(c=>{const row=element('article',undefined,'record');row.append(element('span',c.author+' · '+c.created_at.slice(0,10),'tag green'),element('p',c.body));return row;}));message.textContent=result.comments.length?'':'첫 댓글을 남겨 주세요.';}
-  form.addEventListener('submit',async event=>{event.preventDefault();if(!observer){openAuth('login');return;}send.disabled=true;try{await api('/posts/'+post.id+'/comments',{author:name.value.trim(),body:input.value.trim()});input.value='';message.textContent='댓글이 저장됐습니다.';try{await reloadComments();}catch{message.textContent='댓글은 저장됐습니다. 목록을 다시 열어 확인해 주세요.';}load();updateStatus();}catch(error){message.textContent=error.message;}finally{send.disabled=!observer;}});
+  const bodyLabel=element('label','당신의 관측을 더해보세요.');bodyLabel.htmlFor='comment-body';
+  const input=element('textarea');input.id='comment-body';input.required=true;input.maxLength=2000;input.placeholder='이 기록에 대한 생각을 남겨주세요.';
+  const send=element('button','댓글 전송 ↗','primary');send.type='submit';send.disabled=!observer;
+  if(!observer){const login=element('button','로그인하고 댓글 쓰기');login.type='button';login.addEventListener('click',()=>openAuth('login'));form.append(login);}
+  form.append(nameLabel,name,bodyLabel,input,send);
+  discussion.append(discussionHeading,comments,message,form);
+  detail.replaceChildren(toolbar,layout,discussion);
+  heading.focus({preventScroll:true});
+
+  async function reloadComments() {
+    const result=await api('/posts/'+post.id+'/comments');
+    if(selected!==post.id)return;
+    comments.replaceChildren(...result.comments.map(c=>{
+      const row=element('article',undefined,'record');
+      row.append(element('span',c.author+' / '+c.created_at.slice(0,10),'tag green'),element('p',c.body));return row;
+    }));
+    count.textContent='RESPONSES / '+String(result.comments.length).padStart(2,'0')+(result.comments.length===200?' (최대 200개)':'');
+    message.textContent=result.comments.length?'':'아직 응답이 없습니다. 첫 관측을 남겨보세요.';
+  }
+  form.addEventListener('submit',async event=>{
+    event.preventDefault();if(!observer){openAuth('login');return;}
+    send.disabled=true;
+    try{
+      await api('/posts/'+post.id+'/comments',{author:name.value.trim(),body:input.value.trim()});
+      input.value='';message.textContent='댓글이 저장됐습니다.';
+      try{await reloadComments();}catch{message.textContent='댓글은 저장됐습니다. 목록을 다시 열어 확인해 주세요.';}
+      load();updateStatus();
+    }catch(error){message.textContent=error.message;}
+    finally{send.disabled=!observer;}
+  });
   try{await reloadComments();}catch(error){message.textContent=error.message;}
 }
 $('record-form').addEventListener('submit',async event=>{
