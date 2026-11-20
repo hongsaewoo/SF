@@ -117,7 +117,20 @@
 </section>
 <section id="archive" class="page" hidden><div class="page-title"><div><div class="eyebrow">02 / SIGNAL ARCHIVE</div><h2 id="archive-heading">사라지기 전에, 기록.</h2><p class="muted">관측된 순간과 그 너머의 이야기들.</p></div></div><div class="toolbar"><input id="search" type="search" aria-label="기록 검색" placeholder="제목, 내용 또는 분류 검색..."><button class="primary" data-page="submit">+ NEW RECORD</button></div><div id="archive-list" class="cards"></div></section>
 <section id="submit" class="page" hidden><div class="eyebrow">03 / TRANSMIT A SIGNAL</div><h2>당신은 무엇을 발견했나요?</h2><p class="muted">작은 이상 징후도 하나의 좌표가 됩니다.</p><form id="record-form"><label for="title">01 / 기록 제목</label><input id="title" required maxlength="100" placeholder="신호에 이름을 붙여 주세요"><label for="category">02 / 분류</label><select id="category"><option>OBSERVATION</option><option>THOUGHT</option><option>DISCOVERY</option></select><label for="body">03 / 관측 내용</label><textarea id="body" required maxlength="10000" placeholder="언제, 어디서, 무엇을 관측했나요?"></textarea><div class="form-actions"><button class="primary" type="submit">SAVE RECORD ↗</button><span class="tag muted">SHARED ARCHIVE</span></div><p class="muted">로그인한 계정의 닉네임으로 글이 공개됩니다. 개인정보는 작성하지 마세요.</p><p id="notice" role="status"></p></form></section>
-</main><footer class="site-footer"><span>© 2026 NULL / VECTOR — INDEPENDENT OBSERVATION NETWORK</span><span>STAY CURIOUS. KEEP RECORDING. ↗</span></footer>
+</main>
+<div id="chat-widget">
+<section id="chat-panel" class="chat-panel" aria-labelledby="chat-heading" hidden>
+<div class="chat-header"><div><span class="chat-eyebrow">OPEN CHANNEL / 01</span><h2 id="chat-heading">관측자 라운지</h2></div><button id="chat-close" type="button" aria-label="채팅창 접기">−</button></div>
+<div class="chat-channel"><span class="dot"></span><span>모두에게 공개되는 공용 채팅</span><span id="chat-connection">연결 중</span></div>
+<div id="chat-log" class="chat-log" role="log" aria-label="공용 채팅 메시지" aria-live="polite" aria-relevant="additions" tabindex="0"><p id="chat-empty" class="chat-empty">메시지를 불러오는 중…</p></div>
+<button id="chat-new" class="chat-new" type="button" hidden>새 메시지 ↓</button>
+<div id="chat-guest" class="chat-guest"><span>로그인하고 대화에 참여하세요.</span><button type="button" id="chat-login">로그인 ↗</button></div>
+<form id="chat-form" class="chat-form" hidden><label for="chat-input" class="chat-sr-only">메시지 (최대 500자)</label><div class="chat-compose"><textarea id="chat-input" rows="2" maxlength="500" placeholder="메시지 입력…" required></textarea><button id="chat-send" class="primary" type="submit" aria-label="메시지 전송">↑</button></div><div class="chat-compose-meta"><span>Enter 전송 · Shift+Enter 줄바꿈</span><span id="chat-count">0 / 500</span></div></form>
+<div class="chat-feedback"><p id="chat-status" role="status"></p><button id="chat-retry" type="button" hidden>다시 연결</button></div>
+</section>
+<button id="chat-toggle" class="chat-toggle" type="button" aria-expanded="false" aria-controls="chat-panel"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M4 4h16v12H9l-5 4V4Z" stroke="currentColor" stroke-width="1.3"/><path d="M8 8h8M8 12h5" stroke="currentColor" stroke-width="1.3"/></svg><span>공용 채팅</span><span class="chat-toggle-arrow" aria-hidden="true">⌃</span></button>
+</div>
+<footer class="site-footer"><span>© 2026 NULL / VECTOR — INDEPENDENT OBSERVATION NETWORK</span><span>STAY CURIOUS. KEEP RECORDING. ↗</span></footer>
 </div>
 <dialog id="auth-dialog" aria-labelledby="auth-heading">
 <div class="auth-dialog-top"><span class="tag muted">OBSERVER ACCESS</span><button type="button" id="auth-close" aria-label="닫기">✕</button></div>
@@ -207,4 +220,4 @@ scope.addEventListener('click', () => {
   lockTarget();
   enterApp();
 });
-</script><script src="community.js" defer></script></body></html>
+</script><script src="community.js" defer></script><script src="chat.js" defer></script></body></html>

@@ -87,8 +87,24 @@ Cloudflare **Workers & Pages → sf → Settings → Builds**에서:
 
 `deploy.mjs`는 0001의 게시판 스키마를 확보하고, 운영 DB의 posts/comments 컬럼을 조회한 뒤 0002의 계정 스키마와 없는 user_id 컬럼만 적용합니다. Console로 이미 0002를 적용했거나 일부 컬럼만 적용한 DB도 다시 실행할 수 있습니다. 기존 글·회원 데이터를 삭제하지 않습니다. DB 작업 실패·권한 부족·잘못된 설정 시 Worker 배포를 중단합니다.
 
-이 스크립트는 현재 저장소의 0001/0002 스키마를 자동 준비합니다. 추후 다른 DB 변경 파일을 추가할 때에는 배포 스크립트에도 해당 변경을 연결해야 합니다. 프로덕션 배포용이며 별도 미리보기 배포 명령은 유지하세요. Workers Builds의 `WORKERS_CI_BRANCH`가 main이 아니면 실행을 중단합니다.
+이 스크립트는 현재 저장소의 0001/0002/0003 스키마를 자동 준비합니다. 추후 다른 DB 변경 파일을 추가할 때에는 배포 스크립트에도 해당 변경을 연결해야 합니다. 프로덕션 배포용이며 별도 미리보기 배포 명령은 유지하세요. Workers Builds의 `WORKERS_CI_BRANCH`가 main이 아니면 실행을 중단합니다.
 
 로컬 검증: `node test-deploy.mjs`는 원격 연결 없이 새 DB, 기존 DB, 일부 적용, 수동 적용, 재실행, 데이터 보존과 실패 시 배포 중단을 확인합니다. 실제 Cloudflare 배포 검증은 계정 소유자의 최초 설정 후 필요합니다.
 
 공식 문서: [Workers Builds 설정·토큰 권한](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/), [D1 SQL 실행 명령](https://developers.cloudflare.com/d1/wrangler-commands/#d1-execute).
+
+
+## 공용 채팅
+
+입장 후 화면 좌측 하단의 **공용 채팅** 버튼을 누르면 라운지가 위로 펼쳐집니다. 아카이브·글 상세·작성 화면으로 이동해도 같은 창과 입력 중인 메시지를 유지하며, 입장 전 조준경 화면에서는 보이지 않습니다.
+
+- 전체 공개 채널입니다. 비로그인 사용자는 읽을 수 있고 로그인한 사용자는 계정 닉네임으로 전송합니다.
+- 창이 열려 있고 브라우저 탭이 보일 때만 5초마다 갱신합니다. WebSocket 방식은 아닙니다. 닫으면 갱신을 멈춥니다.
+- 최근 50개로 시작하고 이후 메시지는 순서대로 추가합니다. 화면에는 최근 200개까지 유지합니다. DB 기록은 자동 삭제하지 않습니다.
+- 메시지는 최대 500자이며 계정당 2초의 작성 간격을 적용합니다. 전송 실패 후 동일 요청을 다시 보내도 중복 저장하지 않습니다.
+- Enter로 전송, Shift+Enter로 줄바꿈합니다. 한글 조합 중 Enter는 전송하지 않습니다. Escape 또는 접기 버튼으로 닫습니다.
+- 로그아웃·계정 변경 시 입력 중인 메시지는 비웁니다. 다른 계정으로 초안이 이어지지 않습니다.
+
+`migrations/0003_chat.sql`이 필요합니다. **Workers 배포 명령이 `node deploy.mjs`이면 자동 적용**합니다. 이전 수동 배포 명령을 계속 쓰는 경우, D1 Console에서 0003_chat.sql을 적용해야 합니다. 채팅 마이그레이션은 재실행할 수 있습니다.
+
+검증: `node test-chat.mjs`, `node test-chat-ui.mjs`, `node test-deploy.mjs`, `node test-community.mjs`.

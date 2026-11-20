@@ -9,6 +9,7 @@ const dir=await mkdtemp(join(tmpdir(),'sf-deploy-test-'));
 const configPath=join(dir,'config.json');
 const schema1=readFileSync('migrations/0001_community.sql','utf8');
 const schema2=readFileSync('migrations/0002_accounts.sql','utf8');
+const schema3=readFileSync('migrations/0003_chat.sql','utf8');
 try {
   await writeFile(configPath,JSON.stringify({d1_databases:[{binding:'DB',database_id:'00000000-0000-0000-0000-000000000001'}]}));
   for (const state of ['new','old','partial','manual']) {
@@ -16,6 +17,7 @@ try {
     if(state!=='new')db.exec(schema1);
     if(state==='partial'){db.exec(schema2.split('ALTER TABLE comments')[0]);}
     if(state==='manual'){db.exec(schema2);db.prepare("INSERT INTO users(id,username,nickname,password_hash,salt,iterations,created_at) VALUES ('member','existing_user','Existing','hash','salt',100000,'2026-11-18')").run();}
+    if(state==='manual'){db.exec(schema3);db.prepare("INSERT INTO chat_messages(user_id,author,body,client_id,created_at) VALUES ('member','Existing','Preserve chat',?,'2026-11-20')").run(crypto.randomUUID());}
     if(state!=='new')db.prepare("INSERT INTO posts(id,title,body,author,category,created_at) VALUES ('legacy','Legacy','Body','Guest','THOUGHT','2026-11-18')").run();
     const run=args=>{
       if(args[0]==='deploy'){deployments++;return '';}
@@ -29,6 +31,10 @@ try {
     for(const table of ['posts','comments'])assert.ok(db.prepare(`PRAGMA table_info(${table})`).all().some(c=>c.name==='user_id'));
     assert.equal(db.prepare("SELECT COUNT(*) AS n FROM users").get().n,state==='manual'?1:0);
     if(state!=='new')assert.equal(db.prepare('SELECT title FROM posts WHERE id=?').get('legacy').title,'Legacy');
+    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM chat_messages').get().n,state==='manual'?1:0);
+    let deployedAfterFailure=false;
+    await assert.rejects(deploy({configPath,branch:'main',run(args){if(args[0]==='deploy')deployedAfterFailure=true;if(args.some(arg=>arg.endsWith('0003_chat.sql')))throw new Error('chat migration denied');return run(args);}}),/chat migration denied/);
+    assert.equal(deployedAfterFailure,false);
     let calls=0;
     await assert.rejects(deploy({configPath,branch:'feature',run(){calls++;}}),/production/);assert.equal(calls,0);
     await assert.rejects(deploy({configPath,branch:'main',run(args){if(args[0]==='deploy')throw new Error('MUST NOT DEPLOY');throw new Error('D1 permission denied');}}),/D1 permission denied/);

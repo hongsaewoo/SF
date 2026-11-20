@@ -40,6 +40,7 @@ function syncObserver() {
   byline.textContent=observer?observer.nickname+' 님의 기록으로 공개됩니다.':'로그인 후 기록을 남길 수 있습니다.';
   writePrompt.hidden=!!observer;
   $('record-form').querySelector('button[type=submit]').disabled=!observer;
+  window.dispatchEvent(new Event('observerchange'));
 }
 document.querySelectorAll('[data-auth]').forEach(b=>b.addEventListener('click',()=>openAuth(b.dataset.auth)));
 document.querySelectorAll('[data-auth-tab]').forEach(b=>b.addEventListener('click',()=>openAuth(b.dataset.authTab)));

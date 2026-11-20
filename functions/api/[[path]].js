@@ -1,3 +1,4 @@
+import {chatRoute} from '../_lib/chat.js';
 import {authRoute,currentUser} from '../_lib/auth.js';
 const categories = new Set(['OBSERVATION', 'THOUGHT', 'DISCOVERY']);
 const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers: {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
@@ -21,6 +22,7 @@ export async function onRequest({request, env}) {
       try { data = JSON.parse(raw); } catch { return json({error:'올바르지 않은 요청입니다.'},400); }
       if (!data || typeof data !== 'object') return json({error:'올바르지 않은 요청입니다.'},400);
     }
+    if (path==='/api/chat/messages' && ['GET','POST'].includes(request.method)) return await chatRoute(request,env.DB,data,json);
     if (request.method === 'GET' && path === '/api/auth/me') return await authRoute(request,env.DB,path,null,json);
     if (request.method === 'POST' && ['/api/auth/signup','/api/auth/login','/api/auth/logout'].includes(path)) return await authRoute(request,env.DB,path,data,json);
     if (request.method === 'GET' && path === '/api/status') {

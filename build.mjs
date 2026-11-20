@@ -1,7 +1,7 @@
 import {mkdir,copyFile,readFile,writeFile,cp} from 'node:fs/promises';
 await mkdir('public',{recursive:true});
 await cp('assets','public/assets',{recursive:true});
-for (const file of ['index.html','community.js','hud.css','_routes.json']) await copyFile(file,`public/${file}`);
+for (const file of ['index.html','community.js','chat.js','hud.css','_routes.json']) await copyFile(file,`public/${file}`);
 // Build-time variable is a database UUID, never an API token.
 const config = JSON.parse(await readFile('wrangler.jsonc','utf8'));
 const databaseId = process.env.D1_DATABASE_ID?.trim();

@@ -30,6 +30,8 @@ export async function deploy({run=wrangler,configPath=join(root,'wrangler.deploy
   } finally {
     await rm(dir,{recursive:true,force:true});
   }
+  console.log('Ensuring shared chat tables exist…');
+  run([...base,'--file',join(root,'migrations/0003_chat.sql')]);
   // A schema or permission error throws above, so incompatible code is never deployed.
   console.log('Database ready. Deploying Worker and assets…');
   const output=run(['deploy','--config',configPath]);
